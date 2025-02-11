@@ -18,8 +18,9 @@ public:
     static const size_t size = Size;
     using value_type = T;
 
-    Buffer(Buffer<T, Size>&& other) = delete;
     Buffer() = default;
+    Buffer(Buffer<T, Size>&& other) = delete;
+    virtual ~Buffer() = default;
 
     /**
      * @brief Copy constructor.
@@ -62,7 +63,6 @@ public:
      * @return T& Reference to the front element.
      */
     T& Front() {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.front();
     }
 
@@ -72,7 +72,6 @@ public:
      * @return T& Reference to the back element.
      */
     T& Back() {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.back();
     }
 
@@ -95,7 +94,6 @@ public:
      * @return size_t Count of elements.
      */
     size_t Count() const {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.size();
     }
 
@@ -135,7 +133,6 @@ public:
      * @return true if empty, false otherwise.
      */
     bool isEmpty() const {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.empty();
     }
 
@@ -145,20 +142,16 @@ public:
      * @return true if full, false otherwise.
      */
     bool isFull() const {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.size() == Buffer::size;
     }
 
     bool isHalf() const {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.size() == Buffer::size / 2;
     }
     bool isAboveHalf() const {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.size() > Buffer::size / 2;
     }
     bool isBelowHalf() const {
-        std::lock_guard<std::mutex> lock(mutex);
         return _buf.size() < Buffer::size / 2;
     }
 

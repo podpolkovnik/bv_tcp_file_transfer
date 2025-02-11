@@ -7,9 +7,6 @@
  */
 class Worker {
 public:
-    Worker() = default;
-    Worker(const Worker&) = default;
-    Worker(Worker&&) = default;
     virtual ~Worker() = default;
 
     /**

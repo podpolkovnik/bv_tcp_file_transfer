@@ -14,6 +14,7 @@
 class FISocket {
 public:
     FISocket() = default;
+    ~FISocket() { Close(); }
 
     /**
      * @brief Initializes the server socket.
@@ -50,6 +51,9 @@ private:
  */
 class FOSocket {
 public:
+    FOSocket() = default;
+    ~FOSocket() { Close(); }
+
     /**
      * @brief Connects to the destination server.
      *
