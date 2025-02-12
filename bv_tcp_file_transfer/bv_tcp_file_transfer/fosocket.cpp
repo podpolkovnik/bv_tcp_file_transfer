@@ -57,15 +57,15 @@ status FOSocket::Connect(const std::string& dst_addr, const uint16_t dst_port) {
 }
 
 void FOSocket::Transmit(const std::string& location) {
-    FileReaderWorker frw(location, _pool);
+    FileReaderWorker frw(location, pool());
     std::thread frwt(std::ref(frw));
     size_t chunk_cnt = 0;
 
     tcpft_logInfo("transmit ", "\"", location, "\" starting...");
 
-    while (!(frw.isFinished() && _pool.isEmpty())) {
-        _pool.waitForNotEmpty();
-        Chunk chunk = _pool.Pop();
+    while (!(frw.isFinished() && pool().isEmpty())) {
+        pool().waitForNotEmpty();
+        Chunk chunk = pool().Pop();
 
         std::string buf;
         while (!chunk.isEmpty()) {

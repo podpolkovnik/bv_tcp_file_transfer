@@ -70,7 +70,7 @@ status FISocket::Init(const std::string& src_addr, const uint16_t src_port) {
 }
 
 void FISocket::Receive(const std::string& location) {
-    FileWriterWorker fww(location, _pool);
+    FileWriterWorker fww(location, pool());
     std::thread fwwt(std::ref(fww));
 
     tcpft_sock sock = _server.Accept();
@@ -87,7 +87,7 @@ void FISocket::Receive(const std::string& location) {
             }
             ++chunk_cnt;
             tcpft_logInfo("receive chunk: ", chunk_cnt, ", size: ", nb);
-            _pool.Fit(buf);
+            pool().Fit(buf);
         }
         else if (nb == 0) {
             fww.Finish();

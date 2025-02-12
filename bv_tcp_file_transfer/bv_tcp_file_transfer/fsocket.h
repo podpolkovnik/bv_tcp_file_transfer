@@ -7,11 +7,33 @@
 #include <string>
 
 /**
+ * @brief Socket-based file receiver/transmitter base class.
+ *
+ */
+class FSocket {
+public:
+    virtual ~FSocket() = default;
+
+    /**
+     * @brief Closes the socket.
+     *
+     * @return int Result of closing.
+     */
+    virtual int Close() = 0;
+
+protected:
+    Pool& pool() { return _pool; }
+
+private:
+    Pool _pool;
+};
+
+/**
  * @brief Socket-based file receiver.
  *
  * Receives data over TCP and writes it to a file using a FileWriterWorker.
  */
-class FISocket {
+class FISocket : public FSocket {
 public:
     FISocket() = default;
     ~FISocket() { Close(); }
@@ -37,10 +59,9 @@ public:
      *
      * @return int Result of closing.
      */
-    int Close();
+    int Close() override;
 
 private:
-    Pool _pool;
     TCPServer _server;
 };
 
@@ -49,7 +70,7 @@ private:
  *
  * Reads a file and sends its data over TCP using a FileReaderWorker.
  */
-class FOSocket {
+class FOSocket : public FSocket {
 public:
     FOSocket() = default;
     ~FOSocket() { Close(); }
@@ -75,9 +96,8 @@ public:
      *
      * @return int Result of closing.
      */
-    int Close();
+    int Close() override;
 
 private:
-    Pool _pool;
     TCPClient _client;
 };
