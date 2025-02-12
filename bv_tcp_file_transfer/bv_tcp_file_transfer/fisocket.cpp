@@ -15,21 +15,16 @@ public:
      * @param pool Reference to the Pool to read chunks from.
      */
     explicit FileWriterWorker(const std::string& location, Pool& pool)
-        : _location(location), _pool(pool), _is_finished(false)
+        : _location(location), _pool(pool), _is_finished(false), _is_finish_requested(false)
     {}
 
     void Work() override {
-        while (true) {
+        while (!(_is_finish_requested.load() && _pool.isEmpty())) {
             _pool.waitForNotEmpty();
             Chunk chunk = _pool.Pop();
 
             while (!chunk.isEmpty()) {
-                if (chunk.Front() != '\0') {
-                    _fw.Write(chunk.Pop());
-                }
-                else {
-                    return;
-                }
+                _fw.Write(chunk.Pop());
             }
         }
     }
@@ -41,6 +36,14 @@ public:
      */
     bool isFinished() {
         return _is_finished.load();
+    }
+
+    /**
+     * @brief Finish worker.
+     *
+     */
+    void Finish() {
+        _is_finish_requested.store(true);
     }
 
 protected:
@@ -59,6 +62,7 @@ private:
     Pool& _pool;
     FileWriter _fw;
     std::atomic<bool> _is_finished;
+    std::atomic<bool> _is_finish_requested;
 };
 
 status FISocket::Init(const std::string& src_addr, const uint16_t src_port) {
@@ -84,6 +88,10 @@ void FISocket::Receive(const std::string& location) {
             ++chunk_cnt;
             tcpft_logInfo("receive chunk: ", chunk_cnt, ", size: ", nb);
             _pool.Fit(buf);
+        }
+        else if (nb == 0) {
+            fww.Finish();
+            break;
         }
     }
 

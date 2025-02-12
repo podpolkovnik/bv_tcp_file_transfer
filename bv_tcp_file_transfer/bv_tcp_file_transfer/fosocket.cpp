@@ -20,12 +20,9 @@ public:
 
     void Work() override {
         // Create a terminator chunk with a '\0' character.
-        Chunk terminator;
-        terminator.Push('\0');
         std::string buf;
         _fr.Read(buf);
         _pool.Fit(buf);
-        _pool.Push(terminator);
     }
 
     /**
@@ -82,6 +79,7 @@ void FOSocket::Transmit(const std::string& location) {
 
     tcpft_logInfo("transmit finished");
     frwt.join();
+    _client.Close();
 }
 
 int FOSocket::Close() {
